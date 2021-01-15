@@ -3,6 +3,9 @@ uuid = "2aee5a0c-801d-490a-8eb9-9947a3af43f3"
 authors = ["Ondřej Podsztavek <ondrej.podsztavek@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
 [compat]
 julia = "1"
 
