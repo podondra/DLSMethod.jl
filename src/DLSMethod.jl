@@ -54,7 +54,7 @@ function dls_fit!(
     fit!(X, y, n, a)
 
     while n > m + 3
-        d = abs.(y[1:n] - X[1:n, :] * a)
+        d = abs.(view(y, 1:n) - view(X ,1:n, :) * a)
         width = maximum(d)
         dls = sum(d .^ 2) / width .^ k
 
