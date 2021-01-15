@@ -4,15 +4,11 @@ using LinearAlgebra
 
 export dls_fit!
 
-function fit(X::Matrix{Float64}, y::Vector{Float64})::Vector{Float64}
-    return inv(X' * X) * X' * y
-end
-
 function fit!(
         X::Matrix{Float64}, y::Vector{Float64}, n::Int64, a::Vector{Float64})
-    X_view = view(X, 1:n, :)
+    X_view = view(X, :, 1:n)
     y_view = view(y, 1:n)
-    a[:] = inv(X_view' * X_view) * X_view' * y_view
+    a[:] = inv(X_view * X_view') * X_view * y_view
     return nothing
 end
 
@@ -24,12 +20,12 @@ function arrange_layer!(
         n_init = n_current
         i = 1
         while i <= n_current
-            y_pred = dot(view(X, i, :), a)
+            y_pred = dot(view(X, :, i), a)
             if abs(y[i] - y_pred) >= remove_distance
-                y_pred = dot(view(X, n_current, :), a)
+                y_pred = dot(view(X, :, n_current), a)
                 if abs(y[n_current] - y_pred) < remove_distance
                     # swap
-                    X[i, :], X[n_current, :] = X[n_current, :], X[i, :]
+                    X[:, i], X[:, n_current] = X[:, n_current], X[:, i]
                     y[i], y[n_current] = y[n_current], y[i]
                 end
                 n_current -= 1
@@ -48,13 +44,13 @@ end
 function dls_fit!(
         X::Matrix{Float64}, y::Vector{Float64},
         k::Int64, removal_parameter::Float64)::Tuple{Int64, Vector{Float64}}
-    n, m = size(X)
+    m, n = size(X)
     subset_n, subset_dls = Int64[], Float64[]
     a = Vector{Float64}(undef, m)
     fit!(X, y, n, a)
 
     while n > m + 3
-        d = abs.(view(y, 1:n) - view(X ,1:n, :) * a)
+        d = abs.(view(y, 1:n) - view(X, :, 1:n)' * a)
         width = maximum(d)
         dls = sum(d .^ 2) / width .^ k
 
