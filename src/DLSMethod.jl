@@ -2,7 +2,7 @@ module DLSMethod
 
 using LinearAlgebra
 
-export dls_fit!
+export dls_fit!, dls_fit
 
 function fit!(
         X::Matrix{Float64}, y::Vector{Float64}, n::Int64, a::Vector{Float64})
@@ -61,6 +61,12 @@ function dls_fit!(
     n_best = subset_n[argmax(subset_dls)]
     fit!(X, y, n_best, a)
     return n_best, a
+end
+
+function dls_fit(
+        X::Matrix{Float64}, y::Vector{Float64},
+        k::Int64, removal_parameter::Float64)::Tuple{Int64, Vector{Float64}}
+    dls_fit!(copy(X), copy(y), k, removal_parameter)
 end
 
 end # module
